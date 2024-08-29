@@ -68,9 +68,59 @@
     </footer>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="{{ asset('js/nav.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            $(document).ready(function () {
+                
+                $('.btn-delete').click(function () {
+                    var postId = $(this).data('id'); // Get the ID of the post to delete
+            
+                    // Show confirmation dialog
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // If confirmed, make an AJAX request to delete the post
+                            $.ajax({
+                                url: '/posts/' + postId,  // Assuming your route is RESTful
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'  // Include CSRF token if needed
+                                },
+                                success: function (response) {
+                                    // Show success message
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'The post has been deleted.',
+                                        'success'
+                                    );
+            
+                                    // Optionally, remove the deleted item from the DOM
+                                    $('button[data-id="' + postId + '"]').closest('tr').remove();
+                                },
+                                error: function (xhr) {
+                                    // Handle error
+                                    Swal.fire(
+                                        'Error!',
+                                        'Something went wrong while deleting the post.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+            </script>
   </body>
 </html>
