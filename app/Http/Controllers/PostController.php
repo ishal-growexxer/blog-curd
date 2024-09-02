@@ -31,19 +31,19 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
        
-        $validated = $request->validate([
-            'title' => 'required|string|unique:posts|min:5|max:100',
-            'body' => 'required|string|min:5|max:2000',
-        ]);
+        // $validated = $request->validate([
+        //     'title' => 'required|string|unique:posts|min:5|max:100',
+        //     'body' => 'required|string|min:5|max:2000',
+        // ]);
         
         $validated['user_id'] = auth()->user()->id;
         $validated['slug'] = Str::slug($validated['title'], '-');
         $post = Post::create($validated);
     
-        return redirect(route('posts.show', [$post->slug]))->with('notification', 'Post created!');
+        return redirect(route('posts.index'))->with('notification', 'Post created!');
     }
 
     /**
@@ -67,7 +67,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $post)
+    public function update(StorePostRequest $request, $post)
     {
         $validated = $request->validate([
             'title' => 'required|string|unique:posts|min:5|max:100',

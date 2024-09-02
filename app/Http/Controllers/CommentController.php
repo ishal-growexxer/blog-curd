@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Models\Comment;
+use App\Models\Post;
+use Illuminate\Http\Request;
+
 
 class CommentController extends Controller
 {
@@ -27,9 +30,20 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCommentRequest $request)
+    public function store(Request $request, $postId)
     {
-        //
+        $validated = $request->validate([
+            'body' => 'required|min:5|max:1000',
+        ]);
+        $post = Post::findOrFail($postId);
+    
+        $post->comments()->create([
+            'user_id' => auth()->user()->id, 
+            'body' => $request->body,
+        ]);
+    
+        return redirect()->route('posts.show', $postId)->with('notification', 'Comment added successfully!');
+    
     }
 
     /**
